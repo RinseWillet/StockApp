@@ -13,14 +13,13 @@ var dataStock = {
 
 // to do list
 // function als arrowfunction herschrijven
-// labels (datum + tijd) uit JSON response peuteren en tot zinnige labels in een labelarray dataLabels plaatsen
+// labels (datum + tijd) tot zinnige labels in een labelarray dataLabels plaatsen
 // dataTradevolume en datalabels visualiseren in ChartJS
 // dataHigh en datalabels visualiseren in ChartJS
 // dataLow en datalabels visualiseren in ChartJS
 // selector voor grafieken maken
 // input veld voor type aandeel maken
 // crypto currency tracker
-
 
 var tijdsData;
 var dataTradevolume = [];
@@ -39,18 +38,30 @@ function updateStock() {
             if (xhr.status === 'OK' || (xhr.status >= 200 && xhr.status < 400)) {
                 var inhoudDB = JSON.parse(this.responseText);             
                 tijdsData = inhoudDB["Time Series (60min)"];
+                let tempLabels = Object.keys(inhoudDB["Time Series (60min)"]);                
+
+                let q;
+                for (q in tempLabels){
+                    console.log("hiero");
+                    console.log(tempLabels[q]);
+                    dataLabels.push(tempLabels[q]);
+                }
+                
+                          
+                
                 let x;                
                 for (x in tijdsData) {
                     // console.log(tijdsData[x]["5. volume"]);                    
                     dataTradevolume.push(tijdsData[x]["5. volume"]);
                     dataHigh.push(tijdsData[x]["2. high"]);
                     dataLow.push(tijdsData[x]["3. low"]);
+                    console.log(tijdsData[x]);
 
-                }
-                console.log("hallo");             
+                }                            
                 console.log(dataTradevolume);
                 console.log(dataHigh);
                 console.log(dataLow);
+                console.log(dataLabels);
             }
         }
     }
@@ -60,9 +71,6 @@ function updateStock() {
 
 updateStock();
 console.log("hiya");
-
-
-
 
 const labels = [
     'January',
