@@ -11,6 +11,16 @@ var dataStock = {
     }]
 };
 
+// to do list
+// function als arrowfunction herschrijven
+// labels (datum + tijd) uit JSON response peuteren en tot zinnige labels in een labelarray dataLabels plaatsen
+// dataTradevolume en datalabels visualiseren in ChartJS
+// dataHigh en datalabels visualiseren in ChartJS
+// dataLow en datalabels visualiseren in ChartJS
+// selector voor grafieken maken
+// input veld voor type aandeel maken
+// crypto currency tracker
+
 
 var tijdsData;
 var dataTradevolume = [];
@@ -35,7 +45,7 @@ function updateStock() {
                     dataTradevolume.push(tijdsData[x]["5. volume"]);
                     dataHigh.push(tijdsData[x]["2. high"]);
                     dataLow.push(tijdsData[x]["3. low"]);
-                    
+
                 }
                 console.log("hallo");             
                 console.log(dataTradevolume);
