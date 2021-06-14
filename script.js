@@ -14,69 +14,87 @@
 // input veld voor type aandeel maken
 // crypto currency tracker
 
-var dataTradevolume = [];
 var dataHigh = [];
 var dataLow = [];
 var dataLabels = [];
 
+document.getElementById('invoeren').addEventListener("click", () => {
+    allData();
+});
+
 const allData = async () => {
 
-    var dataName = document.getElementById('invoer').value;
+    //invoer uit HTML uitlezen
+    var dataName = document.getElementById('invoer').value.toUpperCase();
     console.log(dataName);
-    var apiKey = "APIKEY";
+
+    //Foutmelding boodschap resetten
+    document.getElementById('message').innerHTML = "";
+
+    //grafiek resetten
+    var oud = document.getElementById('myChart');
+    console.log(oud);
+
+    var apiKey = "API_KEY";
 
     //Alpha Vantage data API adres (url)
     var url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + dataName + "&apikey=" + apiKey;
-    
-    const stockDataCall = await fetch(url);    
-    const stockData = await stockDataCall.json();    
-    if(stockData["Error Message"] === null){
+
+    const stockDataCall = await fetch(url);
+    const stockData = await stockDataCall.json();
+
+    //foutmelding handelen
+    if (stockData["Error Message"]) {
         console.log(stockData["Error Message"]);
-        document.getElementById('message').innerHTML = "foutje";
-        return;       
-    } 
+        let foutmelding = document.getElementById('message');
+        foutmelding.innerHTML = `<h1>Deze API-call ging fout. Weet u zeker dat u een bestaand aandeel heeft ingevoerd?</h1>`
+        return;
+    }
     const update = await stockDataParsing(stockData);
-    const plotten = await setGraphs(dataLabels, dataLow, dataName);
-    
+    const plotten = await setGraphs(dataLabels, dataLow, dataHigh, dataName);
 }
 
-const stockDataParsing = async (data) => { 
-    
-        // uit de variabele de specifieke data (Time Series) halen en array maken voor de namen (labels) van ieder datapunt (i.e. datum + uur)
-        let tempLabels = Object.keys(data["Time Series (Daily)"]);
-            
-        //de uurdata uit het antwoord lezen (Time Series (Daily))
-        tijdsData = data["Time Series (Daily)"];
+const stockDataParsing = async (data) => {
 
-        let x;
-        let tempVolume = [];
-        let tempHigh = [];
-        let tempLow = [];
+    // uit de variabele de specifieke data (Time Series) halen en array maken voor de namen (labels) van ieder datapunt (i.e. datum + uur)
+    let tempLabels = Object.keys(data["Time Series (Daily)"]);
 
-        //data uit de variabele halen voor hoogste ("2. high") en laagste ( "3. low") handelsprijzen en het handelsvolume ("5. volume")
-        for (x in tijdsData) {
-            tempVolume.push(tijdsData[x]["5. volume"]);
-            tempHigh.push(tijdsData[x]["2. high"]);
-            tempLow.push(tijdsData[x]["3. low"]);
-        }
+    //de uurdata uit het antwoord lezen (Time Series (Daily))
+    tijdsData = data["Time Series (Daily)"];
 
-        // het omdraaien van de volgorde 
-        dataLabels = tempLabels.reverse();
-        dataTradevolume = tempVolume.reverse();
-        dataHigh = tempHigh.reverse();
-        dataLow = tempLow.reverse();
+    let x;
+    let tempHigh = [];
+    let tempLow = [];
+
+    //data uit de variabele halen voor hoogste ("2. high") en laagste ( "3. low") handelsprijzen en het handelsvolume ("5. volume")
+    for (x in tijdsData) {
+        tempHigh.push(tijdsData[x]["2. high"]);
+        tempLow.push(tijdsData[x]["3. low"]);       
+    }
+
+    // het omdraaien van de volgorde 
+    dataLabels = tempLabels.reverse();    
+    dataHigh = tempHigh.reverse();
+    dataLow = tempLow.reverse();
 }
 
-// functie om de grafiek te plotten met de labels, data en naam als parameters
-const setGraphs = (labels, antwoordData, name) => {
+// functie om de grafiek te plotten met de labels, data (laag, hoog) en naam als parameters
+const setGraphs = (labels, laag, hoog, naam) => {
+
     const data = {
         labels: labels,
         datasets: [{
-            label: name,
-            backgroundColor: 'rgb(255, 99, 132)',
-            borderColor: 'rgb(255, 99, 132)',
-            data: antwoordData,
-        }]
+            label: naam + " - laagste prijs",
+            backgroundColor: '#004cff',
+            borderColor: '#004cff',
+            data: laag,
+        },{
+            label: naam + " - hoogste prijs",
+            backgroundColor: '#ff0000',
+            borderColor: '#ff0000',
+            data: hoog,
+        }    
+    ]
     };
 
     const config = {
@@ -86,8 +104,13 @@ const setGraphs = (labels, antwoordData, name) => {
     };
 
     // de grafiek in de HTML gaan plaatsen
-    var myChart = new Chart(
+    var mijnGrafiek = new Chart(
         document.getElementById('myChart'),
         config
     );
+
+    document.getElementById('opnieuw').addEventListener("click", () => {
+        mijnGrafiek.destroy();
+    }
+    )
 }

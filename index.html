@@ -5,16 +5,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
     <title>Stock App</title>
 
     <!-- APIKEY -->
 </head>
 <body>
-    <div class="invoer">
-        <p> Voer het aandeel in waarvoor je data wilt krijgen</p>
-        <input type="text" id="invoer">
-        <!-- <label for="knop">Ga!</label> -->
-        <input type="button" onclick="allData()" Value="Invoeren!">
+    <div class="keuze">
+        <p> Voer het aandeel in waarvoor u data wilt visualiseren:</p>
+        <input type="text" id="invoer">        
+        <input type="button" Value="Invoeren!" id="invoeren">
+        <input type="button" Value="Reset" id="opnieuw">
     </div>
     <div>
         <canvas id="myChart">
