@@ -23,7 +23,7 @@ const allData = async () => {
 
     var dataName = document.getElementById('invoer').value;
     console.log(dataName);
-    var apiKey = "WGN8GB3LJSZPZR5R";
+    var apiKey = "YOUR_API_KEY";
 
     //Alpha Vantage data API adres (url)
     var url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + dataName + "&apikey=" + apiKey;
