@@ -1,18 +1,11 @@
 // dit is voor de javascript
 
-var labels1 = [];
-var dataStock = {
-    labels: labels1,
-    dataset: [{
-        label: '',
-        backgroundColor: 'rgb(255, 99, 132)',
-        borderColor: 'rgb(255, 99, 132)',
-        data: [],
-    }]
-};
-
 // to do list
-// function als arrowfunction herschrijven
+//input veld voor aandeel maken
+//foutenhandeling regelen
+//reset knop
+// enkel laatste 30 dagen weergeven
+
 // labels (datum + tijd) tot zinnige labels in een labelarray dataLabels plaatsen
 // dataTradevolume en datalabels visualiseren in ChartJS
 // dataHigh en datalabels visualiseren in ChartJS
@@ -21,82 +14,80 @@ var dataStock = {
 // input veld voor type aandeel maken
 // crypto currency tracker
 
-var tijdsData;
 var dataTradevolume = [];
 var dataHigh = [];
 var dataLow = [];
 var dataLabels = [];
 
-//get the data from Alpha Vantage
-// <!-- WGN8GB3LJSZPZR5R -->
-function updateStock() {
-    var url = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=60min&apikey=WGN8GB3LJSZPZR5R"
-    var xhr = new XMLHttpRequest();
-    console.log(tijdsData);
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-            if (xhr.status === 'OK' || (xhr.status >= 200 && xhr.status < 400)) {
-                var inhoudDB = JSON.parse(this.responseText);             
-                tijdsData = inhoudDB["Time Series (60min)"];
-                let tempLabels = Object.keys(inhoudDB["Time Series (60min)"]);                
+const allData = async () => {
 
-                let q;
-                for (q in tempLabels){
-                    console.log("hiero");
-                    console.log(tempLabels[q]);
-                    dataLabels.push(tempLabels[q]);
-                }
-                
-                          
-                
-                let x;                
-                for (x in tijdsData) {
-                    // console.log(tijdsData[x]["5. volume"]);                    
-                    dataTradevolume.push(tijdsData[x]["5. volume"]);
-                    dataHigh.push(tijdsData[x]["2. high"]);
-                    dataLow.push(tijdsData[x]["3. low"]);
-                    console.log(tijdsData[x]);
+    var dataName = document.getElementById('invoer').value;
+    console.log(dataName);
+    var apiKey = "WGN8GB3LJSZPZR5R";
 
-                }                            
-                console.log(dataTradevolume);
-                console.log(dataHigh);
-                console.log(dataLow);
-                console.log(dataLabels);
-            }
-        }
-    }
-    xhr.open("GET", url, true);
-    xhr.send();
+    //Alpha Vantage data API adres (url)
+    var url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + dataName + "&apikey=" + apiKey;
+    
+    const stockDataCall = await fetch(url);    
+    const stockData = await stockDataCall.json();    
+    if(stockData["Error Message"] === null){
+        console.log(stockData["Error Message"]);
+        document.getElementById('message').innerHTML = "foutje";
+        return;       
+    } 
+    const update = await stockDataParsing(stockData);
+    const plotten = await setGraphs(dataLabels, dataLow, dataName);
+    
 }
 
-updateStock();
-console.log("hiya");
+const stockDataParsing = async (data) => { 
+    
+        // uit de variabele de specifieke data (Time Series) halen en array maken voor de namen (labels) van ieder datapunt (i.e. datum + uur)
+        let tempLabels = Object.keys(data["Time Series (Daily)"]);
+            
+        //de uurdata uit het antwoord lezen (Time Series (Daily))
+        tijdsData = data["Time Series (Daily)"];
 
-const labels = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-];
-const data = {
-    labels: labels,
-    datasets: [{
-        label: 'My First dataset',
-        backgroundColor: 'rgb(255, 99, 132)',
-        borderColor: 'rgb(255, 99, 132)',
-        data: [0, 10, 5, 2, 20, 30, 45],
-    }]
-};
+        let x;
+        let tempVolume = [];
+        let tempHigh = [];
+        let tempLow = [];
 
-const config = {
-    type: 'line',
-    data,
-    options: {}
-};
+        //data uit de variabele halen voor hoogste ("2. high") en laagste ( "3. low") handelsprijzen en het handelsvolume ("5. volume")
+        for (x in tijdsData) {
+            tempVolume.push(tijdsData[x]["5. volume"]);
+            tempHigh.push(tijdsData[x]["2. high"]);
+            tempLow.push(tijdsData[x]["3. low"]);
+        }
 
-var myChart = new Chart(
-    document.getElementById('myChart'),
-    config
-);
+        // het omdraaien van de volgorde 
+        dataLabels = tempLabels.reverse();
+        dataTradevolume = tempVolume.reverse();
+        dataHigh = tempHigh.reverse();
+        dataLow = tempLow.reverse();
+}
+
+// functie om de grafiek te plotten met de labels, data en naam als parameters
+const setGraphs = (labels, antwoordData, name) => {
+    const data = {
+        labels: labels,
+        datasets: [{
+            label: name,
+            backgroundColor: 'rgb(255, 99, 132)',
+            borderColor: 'rgb(255, 99, 132)',
+            data: antwoordData,
+        }]
+    };
+
+    const config = {
+        type: 'line',
+        data,
+        options: {}
+    };
+
+    // de grafiek in de HTML gaan plaatsen
+    var myChart = new Chart(
+        document.getElementById('myChart'),
+        config
+    );
+}

@@ -3,17 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width= , initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <title>Stock App</title>
 
     <!-- WGN8GB3LJSZPZR5R -->
 </head>
 <body>
+    <div class="invoer">
+        <p> Voer het aandeel in waarvoor je data wilt krijgen</p>
+        <input type="text" id="invoer">
+        <!-- <label for="knop">Ga!</label> -->
+        <input type="button" onclick="allData()" Value="Invoeren!">
+    </div>
     <div>
         <canvas id="myChart">
 
         </canvas>
+      </div>
+      <div id="message">
+
       </div>
 
       <script src="script.js"/>        
