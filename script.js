@@ -2,14 +2,13 @@
 
 // to do list
 //input veld voor aandeel maken
-//foutenhandeling regelen
-//reset knop
+
+//zorg dat grafiek past op scherm
+// waarde in euro's
+
+
 // enkel laatste 30 dagen weergeven
 
-// labels (datum + tijd) tot zinnige labels in een labelarray dataLabels plaatsen
-// dataTradevolume en datalabels visualiseren in ChartJS
-// dataHigh en datalabels visualiseren in ChartJS
-// dataLow en datalabels visualiseren in ChartJS
 // selector voor grafieken maken
 // input veld voor type aandeel maken
 // crypto currency tracker
@@ -43,6 +42,8 @@ const allData = async () => {
 
     const stockDataCall = await fetch(url);
     const stockData = await stockDataCall.json();
+    console.log(stockData);
+    
 
     //foutmelding handelen
     if (stockData["Error Message"]) {
@@ -81,6 +82,8 @@ const stockDataParsing = async (data) => {
 
 // functie om de grafiek te plotten met de labels, data (laag, hoog) en naam als parameters
 const setGraphs = (labels, laag, hoog, naam) => {
+
+    //hier definieer je dat data-plots, labels X-as, naam, kleur, etc.
 
     const data = {
         labels: labels,
