@@ -13,19 +13,15 @@
   <body>
     <div class="keuze">
       <p>Kies het aandeel in waarvoor u data wilt visualiseren:</p>
-      <input type="button" value="ASML" id="ASML" />
-      <input type="button" value="NVidia" id="NVDA" />
-      <input type="button" value="Bitcoin" id="BTC" />
-      <input type="button" value="Ethereum" id="ETH" />
-      <input type="button" value="Reset" id="opnieuw" />
+      <input type="button" class="button" value="ASML" id="ASML" />
+      <input type="button" class="button" value="NVidia" id="NVDA" />
+      <input type="button" class="button" value="Bitcoin" id="BTC" />
+      <input type="button" class="button" value="Ethereum" id="ETH" />
+      <input type="button" class="button" value="Reset" id="opnieuw" />
     </div>
-    <div class="data-container">
-      <div class="chart-container">
-        <canvas id="myChart"> </canvas>
-      </div>
-      <div class="description"></div>
+    <div id="chart-container">
+      <canvas id="myChart"> </canvas>
     </div>
-
     <div id="message"></div>
 
     <script src="script.js" />

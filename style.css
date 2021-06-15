@@ -6,38 +6,45 @@
 
 html {
     font-size: 62.5%;
+    color: white;
 }
 
 body {
     min-height: 100vh;
-    background: #E0F7FA;
+    background-image: url("background.webp");    
+    background-color: #E0F7FA;
     padding: 4rem;
 }
 
 .keuze {
-    background: #80DEEA;
+    background: rgba(128, 222, 234, 0.9);
     height: 10vh;    
     font-size: 2.5rem;
     padding: 1rem;
 }
 
-.data-container{
+.button{
+  background-color: #1976D2;
+  border: none;
+  color: white;
+  padding: 1.2rem 3.2rem;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 1.6rem;
+  margin: 0.3rem 0.2rem;
+  cursor: pointer;
+}
+
+#chart-container{   
+    height: 75vh; 
+    margin-top: 2rem;
+    position: relative;
     display: flex;
-}
-
-.chart-container{
-    display: flex; 
-    height: 60vh;
-    width: 60vw;
-    padding: 1rem;     
-}
-
-.description{
-    height: 50vh;
-    width: 60vh;
-    padding: 1rem;
-    margin: 2rem;
-    border: 0.1rem solid black; 
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    object-fit: cover;   
 }
 
 #message{

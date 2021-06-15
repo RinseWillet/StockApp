@@ -1,21 +1,11 @@
 // dit is voor de javascript
 
 // to do list
-//input veld voor aandeel maken
-
-//zorg dat grafiek past op scherm
-// waarde in euro's
-
-
-// enkel laatste 30 dagen weergeven
-
-// selector voor grafieken maken
-// input veld voor type aandeel maken
-// crypto currency tracker
 
 var dataHigh = [];
 var dataLow = [];
 var dataLabels = [];
+var dataWaarde = "";
 
 // als op invoeren gedrukt wordt start aanmaken van grafiek
 // deze link op https://www.alphavantage.co/documentation/ (https://www.alphavantage.co/query?function=LISTING_STATUS&apikey=demo) geeft een lijst van alle
@@ -43,28 +33,29 @@ document.getElementById('ETH').addEventListener("click", () => {
 
 const allData = async (aandeelNaam, optie) => {
 
+    document.getElementById("chart-container").style.backgroundColor = "rgba(224,247,250, 0.85)";
+
     //invoer uit HTML uitlezen
-    var dataName = aandeelNaam;
-    console.log(dataName);
+    var dataName = aandeelNaam; 
 
     //Foutmelding boodschap resetten
     document.getElementById('message').innerHTML = "";
 
-    //grafiek resetten
-    var oud = document.getElementById('myChart');
-    console.log(oud);
-
+    //api key
     var apiKey = "WGN8GB3LJSZPZR5R";
 
+    //variabele voor de url afhankelijk van optie
     var url = "";
 
     if (optie === 1) {
         //Alpha Vantage data API adres (url) om aandelen op te vragen (Daily Series)
         url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + dataName + "&apikey=" + apiKey;
+        dataWaarde = "USD";
     }
 
     if (optie === 2) {
         url = "https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol=" + dataName + "&market=EUR&apikey=" + apiKey;
+        dataWaarde = "EURO";
     }  
 
     const stockDataCall = await fetch(url);
@@ -79,7 +70,7 @@ const allData = async (aandeelNaam, optie) => {
         return;
     }
     const update = await stockDataParsing(stockData, optie);
-    const plotten = await setGraphs(dataLabels, dataLow, dataHigh, dataName);
+    const plotten = await setGraphs(dataLabels, dataLow, dataHigh, dataName, dataWaarde);
 }
 
 const stockDataParsing = async (data, optie) => {
@@ -142,7 +133,11 @@ const stockDataParsing = async (data, optie) => {
 }
 
 // functie om de grafiek te plotten met de labels, data (laag, hoog) en naam als parameters
-const setGraphs = (labels, laag, hoog, naam) => {
+const setGraphs = (labels, laag, hoog, naam, waarde) => {
+    console.log(waarde);
+
+    //aanpassen kleur div om grafiek op te plotten
+    let area = document.getElementsByClassName("chart-container")
 
     //hier definieer je dat data-plots, labels X-as, naam, kleur, etc.
 
@@ -166,7 +161,28 @@ const setGraphs = (labels, laag, hoog, naam) => {
         type: 'line',
         data,
         options: {
-
+            maintainAspectRatio: false,
+            responsive: true,
+            scales: {
+                x: {
+                    grid: {
+                        color: 'grey',                                             
+                    },
+                    title: {
+                        display: true,
+                        text: 'DATUM',                        
+                    },                    
+                },
+                y: {
+                    grid: {
+                        color: 'grey',                                               
+                    },
+                    title: {
+                        display: true,
+                        text: waarde,                        
+                    },                    
+                }
+            },            
         }
     };
 
@@ -179,7 +195,7 @@ const setGraphs = (labels, laag, hoog, naam) => {
     //grafiek verwijderen als op de knop opnieuw gedrukt wordt
     document.getElementById('opnieuw').addEventListener("click", () => {
         mijnGrafiek.destroy();
+        document.getElementById("chart-container").style.backgroundColor = "transparent";
     }
     )
 }
-
