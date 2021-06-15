@@ -21,38 +21,27 @@ var dataLabels = [];
 // deze link op https://www.alphavantage.co/documentation/ (https://www.alphavantage.co/query?function=LISTING_STATUS&apikey=demo) geeft een lijst van alle
 // actieve symbolen in CSV
 
-//IBM
-document.getElementById('IBM').addEventListener("click", () => {
-    allData("IBM");
-});
-
 //ASML
 document.getElementById('ASML').addEventListener("click", () => {
-    allData("ASML");
-});
-
-//AAPL - Apple
-document.getElementById('AAPL').addEventListener("click", () => {
-    allData("AAPL");
+    allData("ASML", 1);
 });
 
 //NVDA - NVidia
 document.getElementById('NVDA').addEventListener("click", () => {
-    allData("AAPL");
+    allData("NVDA", 1);
 });
 
-//AMD - Advanced Micro Devices
-document.getElementById('AMD').addEventListener("click", () => {
-    allData("AMD");
+//Bitcoin
+document.getElementById('BTC').addEventListener("click", () => {
+    allData("BTC", 2);
 });
 
-//INTC - Intel Corp
-document.getElementById('INTC').addEventListener("click", () => {
-    allData("INTC");
+//Ethereum
+document.getElementById('ETH').addEventListener("click", () => {
+    allData("ETH", 2);
 });
 
-
-const allData = async (aandeelNaam) => {
+const allData = async (aandeelNaam, optie) => {
 
     //invoer uit HTML uitlezen
     var dataName = aandeelNaam;
@@ -65,43 +54,85 @@ const allData = async (aandeelNaam) => {
     var oud = document.getElementById('myChart');
     console.log(oud);
 
-    var apiKey = "API_KEY";
+    var apiKey = "WGN8GB3LJSZPZR5R";
 
-    //Alpha Vantage data API adres (url)
-    var url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + dataName + "&apikey=" + apiKey;
+    var url = "";
+
+    if (optie === 1) {
+        //Alpha Vantage data API adres (url) om aandelen op te vragen (Daily Series)
+        url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + dataName + "&apikey=" + apiKey;
+    }
+
+    if (optie === 2) {
+        url = "https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol=" + dataName + "&market=EUR&apikey=" + apiKey;
+    }  
 
     const stockDataCall = await fetch(url);
     const stockData = await stockDataCall.json();
     console.log(stockData);
-    
 
     //foutmelding handelen
-    if (stockData["Error Message"]) {
-        console.log(stockData["Error Message"]);
+    if (stockData["Note"]) {
+        console.log(stockData["Note"]);
         let foutmelding = document.getElementById('message');
-        foutmelding.innerHTML = `<h1>Deze API-call ging fout. Weet u zeker dat u een bestaand aandeel heeft ingevoerd?</h1>`
+        foutmelding.innerHTML = `<h1>Deze API-call ging fout.</h1>`
         return;
     }
-    const update = await stockDataParsing(stockData);
+    const update = await stockDataParsing(stockData, optie);
     const plotten = await setGraphs(dataLabels, dataLow, dataHigh, dataName);
 }
 
-const stockDataParsing = async (data) => {
+const stockDataParsing = async (data, optie) => {
 
-    // uit de variabele de specifieke data (Time Series) halen en array maken voor de namen (labels) van ieder datapunt (i.e. datum + uur)
-    let tempLabels = Object.keys(data["Time Series (Daily)"]);
-
-    //de uurdata uit het antwoord lezen (Time Series (Daily))
-    tijdsData = data["Time Series (Daily)"];
-
+    // tijdelijke lokale variabelen die nodig zijn om de data uit de JSON te parsen
     let x;
+    let tempLabels = [];
     let tempHigh = [];
     let tempLow = [];
+    let aandeel = 70;
+    let crypto = 940;    
 
-    //data uit de variabele halen voor hoogste ("2. high") en laagste ( "3. low") handelsprijzen en het handelsvolume ("5. volume")
-    for (x in tijdsData) {
-        tempHigh.push(tijdsData[x]["2. high"]);
-        tempLow.push(tijdsData[x]["3. low"]);
+    if (optie === 1) {
+        // uit de variabele de specifieke data (Time Series) halen en array maken voor de namen (labels) van ieder datapunt (i.e. datum + uur)
+        tempLabels = Object.keys(data["Time Series (Daily)"]);        
+
+        //de uurdata uit het antwoord lezen (Time Series (Daily))
+        tijdsData = data["Time Series (Daily)"];
+
+        //data uit de variabele halen voor hoogste ("2. high") en laagste ( "3. low") handelsprijzen en het handelsvolume ("5. volume")
+        for (x in tijdsData) {
+            tempHigh.push(tijdsData[x]["2. high"]);
+            tempLow.push(tijdsData[x]["3. low"]);
+        }
+
+        //laatste 70 waarden afhalen om laatste maand over te houden        
+        while(aandeel--){
+            tempLabels.pop();
+            tempHigh.pop();
+            tempLow.pop();
+        }              
+    }
+
+    if (optie === 2) {
+
+        // uit de variabele de specifieke data (Time Series) halen en array maken voor de namen (labels) van ieder datapunt (i.e. datum + uur)
+        tempLabels = Object.keys(data["Time Series (Digital Currency Daily)"]);        
+
+        //de uurdata uit het antwoord lezen (Time Series (Daily))
+        tijdsData = data["Time Series (Digital Currency Daily)"];
+
+        //data uit de variabele halen voor hoogste ("2. high") en laagste ( "3. low") handelsprijzen en het handelsvolume ("5. volume")
+        for (x in tijdsData) {
+            tempHigh.push(tijdsData[x]["2a. high (EUR)"]);
+            tempLow.push(tijdsData[x]["3a. low (EUR)"]);
+        }
+
+        //laatste 940 waarden afhalen om laatste twee maanden over te houden 
+        while(crypto--){
+            tempLabels.pop();
+            tempHigh.pop();
+            tempLow.pop();
+        }
     }
 
     // het omdraaien van de volgorde 
@@ -134,7 +165,9 @@ const setGraphs = (labels, laag, hoog, naam) => {
     const config = {
         type: 'line',
         data,
-        options: {}
+        options: {
+
+        }
     };
 
     // de grafiek in de HTML gaan plaatsen

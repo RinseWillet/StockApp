@@ -10,15 +10,39 @@ html {
 
 body {
     min-height: 100vh;
-    background: greenyellow;
+    background: #E0F7FA;
     padding: 4rem;
 }
 
 .keuze {
-    background: grey;
-    height: 10vh;
-    justify-content: center;
-    align-items: center;
+    background: #80DEEA;
+    height: 10vh;    
     font-size: 2.5rem;
     padding: 1rem;
 }
+
+.data-container{
+    display: flex;
+}
+
+.chart-container{
+    display: flex; 
+    height: 60vh;
+    width: 60vw;
+    padding: 1rem;     
+}
+
+.description{
+    height: 50vh;
+    width: 60vh;
+    padding: 1rem;
+    margin: 2rem;
+    border: 0.1rem solid black; 
+}
+
+#message{
+    font-size:large;    
+    color: white;
+    background: #BF360C;
+}
+

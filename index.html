@@ -12,18 +12,20 @@
   </head>
   <body>
     <div class="keuze">
-      <p>Voer het aandeel in waarvoor u data wilt visualiseren:</p>      
-      <input type="button" value="IBM" id="IBM" />
+      <p>Kies het aandeel in waarvoor u data wilt visualiseren:</p>
       <input type="button" value="ASML" id="ASML" />
-      <input type="button" value="Apple" id="AAPL" />
       <input type="button" value="NVidia" id="NVDA" />
-      <input type="button" value="AMD" id="AMD" />
-      <input type="button" value="Intel" id="INTC" />
+      <input type="button" value="Bitcoin" id="BTC" />
+      <input type="button" value="Ethereum" id="ETH" />
       <input type="button" value="Reset" id="opnieuw" />
     </div>
-    <div>
-      <canvas id="myChart"> </canvas>
+    <div class="data-container">
+      <div class="chart-container">
+        <canvas id="myChart"> </canvas>
+      </div>
+      <div class="description"></div>
     </div>
+
     <div id="message"></div>
 
     <script src="script.js" />
