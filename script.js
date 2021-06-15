@@ -17,15 +17,45 @@ var dataHigh = [];
 var dataLow = [];
 var dataLabels = [];
 
-//als op invoeren gedrukt wordt start aanmaken van grafiek
-document.getElementById('invoeren').addEventListener("click", () => {
-    allData();
+// als op invoeren gedrukt wordt start aanmaken van grafiek
+// deze link op https://www.alphavantage.co/documentation/ (https://www.alphavantage.co/query?function=LISTING_STATUS&apikey=demo) geeft een lijst van alle
+// actieve symbolen in CSV
+
+//IBM
+document.getElementById('IBM').addEventListener("click", () => {
+    allData("IBM");
 });
 
-const allData = async () => {
+//ASML
+document.getElementById('ASML').addEventListener("click", () => {
+    allData("ASML");
+});
+
+//AAPL - Apple
+document.getElementById('AAPL').addEventListener("click", () => {
+    allData("AAPL");
+});
+
+//NVDA - NVidia
+document.getElementById('NVDA').addEventListener("click", () => {
+    allData("AAPL");
+});
+
+//AMD - Advanced Micro Devices
+document.getElementById('AMD').addEventListener("click", () => {
+    allData("AMD");
+});
+
+//INTC - Intel Corp
+document.getElementById('INTC').addEventListener("click", () => {
+    allData("INTC");
+});
+
+
+const allData = async (aandeelNaam) => {
 
     //invoer uit HTML uitlezen
-    var dataName = document.getElementById('invoer').value.toUpperCase();
+    var dataName = aandeelNaam;
     console.log(dataName);
 
     //Foutmelding boodschap resetten
