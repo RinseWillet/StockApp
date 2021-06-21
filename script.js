@@ -42,7 +42,7 @@ const allData = async (aandeelNaam, optie) => {
     document.getElementById('message').innerHTML = "";
 
     //api key
-    var apiKey = "WGN8GB3LJSZPZR5R";
+    var apiKey = "JOUW_API_KEY";
 
     //variabele voor de url afhankelijk van optie
     var url = "";
@@ -59,6 +59,7 @@ const allData = async (aandeelNaam, optie) => {
     }  
 
     const stockDataCall = await fetch(url);
+    console.log(stockDataCall);
     const stockData = await stockDataCall.json();
     console.log(stockData);
 
@@ -77,6 +78,7 @@ const stockDataParsing = async (data, optie) => {
 
     // tijdelijke lokale variabelen die nodig zijn om de data uit de JSON te parsen
     let x;
+    let tijdsData;
     let tempLabels = [];
     let tempHigh = [];
     let tempLow = [];
@@ -101,7 +103,7 @@ const stockDataParsing = async (data, optie) => {
             tempLabels.pop();
             tempHigh.pop();
             tempLow.pop();
-        }              
+        }             
     }
 
     if (optie === 2) {
@@ -112,8 +114,9 @@ const stockDataParsing = async (data, optie) => {
         //de uurdata uit het antwoord lezen (Time Series (Daily))
         tijdsData = data["Time Series (Digital Currency Daily)"];
 
-        //data uit de variabele halen voor hoogste ("2. high") en laagste ( "3. low") handelsprijzen en het handelsvolume ("5. volume")
+        //data uit de variabele halen voor hoogste ("2. high") en laagste ( "3. low") handelsprijzen
         for (x in tijdsData) {
+            console.log(x);
             tempHigh.push(tijdsData[x]["2a. high (EUR)"]);
             tempLow.push(tijdsData[x]["3a. low (EUR)"]);
         }
@@ -126,6 +129,7 @@ const stockDataParsing = async (data, optie) => {
         }
     }
 
+    console.log(tempLabels);
     // het omdraaien van de volgorde 
     dataLabels = tempLabels.reverse();
     dataHigh = tempHigh.reverse();
@@ -133,14 +137,12 @@ const stockDataParsing = async (data, optie) => {
 }
 
 // functie om de grafiek te plotten met de labels, data (laag, hoog) en naam als parameters
-const setGraphs = (labels, laag, hoog, naam, waarde) => {
-    console.log(waarde);
+const setGraphs = (labels, laag, hoog, naam, waarde) => {    
 
     //aanpassen kleur div om grafiek op te plotten
-    let area = document.getElementsByClassName("chart-container")
+    let area = document.getElementsByClassName("chart-container");
 
     //hier definieer je dat data-plots, labels X-as, naam, kleur, etc.
-
     const data = {
         labels: labels,
         datasets: [{
@@ -157,6 +159,7 @@ const setGraphs = (labels, laag, hoog, naam, waarde) => {
         ]
     };
 
+    //hier stel je de verdere configuratie van de grafiek in, met daarin de data const.
     const config = {
         type: 'line',
         data,
