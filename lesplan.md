@@ -262,3 +262,177 @@ const setGraphs = (labels, laag, hoog, naam, waarde) => {
 ```
 
 # Stap 7 Keuze menu maken en resetten grafieken
+
+Nu gaan we de keuze-opties inbouwen, aangezien we nu nog maar 1 aandeel (nl. ASML) er hardcoded ingezet hebben. Daarvoor beginnen we met een extra div in onze html te maken met daarin een aantal knoppen, die we kunnen indrukken om een aandeel te kunnen kiezen. We gaan ook alvast de reset knop bouwen, om de grafiek te kunnen resetten/wissen als we van aandeel willen wijzigen. Dit alles maken we voor de div chart-container.
+
+in index.html
+```HTML
+<div class="keuze">
+    <p>Kies het aandeel in waarvoor u data wilt visualiseren:</p>
+    <input type="button" class="button" value="ASML" id="ASML" />
+    <input type="button" class="button" value="NVidia" id="NVDA" />
+    <input type="button" class="button" value="Reset" id="opnieuw" />
+</div>
+```
+We geven wat styling aan de .keuze div grootte, kleur, hoogte, padding, fontsize. We gaan ook nog wat CSS styling aan de knoppen meegeven, om ze makkelijk zichtbaar te maken. Ik gebruik daarbij text-align om te zorgen dat de naam (value) van de knop in het midden komt, ik geef wat padding mee boven en onder en links en rechts. de display: inline-block geef ik aan dat ik de elementen in de div naast elkaar wil hebben EN dat ik zelf de hoogte, breedte, padding en margin mee mag geven. Font-size 16 pixels (1.6rem) en ik wil dat mn cursor een pointer wordt als ik op de knop kom. 
+
+in style.css
+```CSS
+.keuze {
+    background: rgba(128, 222, 234, 0.9);
+    height: 10vh;    
+    font-size: 2.5rem;
+    padding: 1rem;
+}
+
+.button{
+  background-color: #1976D2;
+  border: none;
+  color: white;
+  padding: 1.2rem 3.2rem;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 1.6rem;
+  margin: 0.3rem 0.2rem;
+  cursor: pointer;
+}
+```
+Nu gaan we in de JavaScript interactiviteit aan de knoppen geven. Ik koppel eerst de button-id met document.getElementById('') en daar koppel ik een eventListener aan die een functie oproept als ik erop klik. Je ziet dat er een naamloze arrowfunctie wordt gestart bij "click" en die functie start vervolgens de allData functie met de String van het aandeel. Nog even de hardcoded functie beneden uitcommenten. Om te voorkomen dat er een fout komt (de grafiek of het Chart Object bestaat immers al) bij het dubbel klikken of het andere aandeel te klikken moeten we een reset knop koppelen die de grafiek uitschakkeld. Dit doen we door een eventlistener in de methode setGraphs te maken die de variabele mijnGrafiek (waarin de Chart zit) vernietigd wordt met .destroy(). Dit is een functionaliteit van Chart.JS om grafiek-objecten te vernietigen, zodat je een nieuwe kunt projecteren in de canvas div. Daarnaast zetten we de achtergrondkleur van de chart-container op transparant, zodat deze niet meer zichtbaar is. Feitelijk heb je nu al een toffe App gemaakt, die in de laatste stap wordt uitgebreid met Cryptocurrency koersen.
+
+in script.js
+```JavaScript
+//buiten alle functies
+//ASML
+document.getElementById('ASML').addEventListener("click", () => {
+    console.log("geklikt");
+    allData("ASML");
+});
+
+//NVDA - NVidia
+document.getElementById('NVDA').addEventListener("click", () => {
+    allData("NVDA");
+});
+
+//In de methode setGraphs:
+
+//grafiek verwijderen als op de knop opnieuw gedrukt wordt
+    document.getElementById('opnieuw').addEventListener("click", () => {
+        mijnGrafiek.destroy();
+        document.getElementById("chart-container").style.backgroundColor = "transparent";
+        }
+    )
+
+//onderaan: 
+//aanroepen functie allData
+// allData("ASML");
+```
+
+# Stap 8 Cryptocurrency koersen
+
+Voor de laatste stap gaan we een andere API van Alpha Vantage, speciaal voor Cryptocurrencies aanroepen. Daarvoor gaan we twee extra knoppen maken in de HTML
+
+in index.html
+```HTML
+<input type="button" class="button" value="Bitcoin" id="BTC" />
+<input type="button" class="button" value="Ethereum" id="ETH" />
+```
+
+Daarnaast gaan we in de JavaScript twee extra eventlisteners koppelen aan de knoppen en we gaan de oude een beetje aanpassen, zodat ze kunnen meegeven dat ze niet de aandelen-API maar de CryptoAPI aanroepen. We gaan daarom ook de allData functie aanpassen. Als ze optie 1 (aandeel) meekrijgen, dan moet de functie zoals die is worden uitgevoerd, maar als als optie 2 wordt meegegeven aan allData (dus Crypto) dan moeten we een andere API aanroepen. We doen dit met een if-statement. Ook willen we het JSON parsen wat anders gaan doen, omdat het JSON antwoord van de Crypto API anders is dan voor de aandelen API. We gaan ook wat extra variabelen aanmaken zodat we de stockDataParsing methode voor beide API calls kunnen gebruiken. Let op! Deze crypto JSON geeft standaard de data voor 1000 dagen mee, dus om gebruik te maken van dezelfde while-loop om alleen maar de laatste maand of 2 maanden te hebben, zetten we de variabele aandeel op 940, zodat we 60 dagen kunnen overhouden in de while loop.
+
+in script.js
+```JavaScript
+// aan variabelen buiten methodes toevoegen:
+
+var tijdSerie = "";
+var hoog = "";
+var laag = "";
+var aandeel = 0;
+
+//ASML
+document.getElementById('ASML').addEventListener("click", () => {
+    allData("ASML", 1);
+});
+
+//NVDA - NVidia
+document.getElementById('NVDA').addEventListener("click", () => {
+    allData("NVDA", 1);
+});
+
+//Bitcoin
+document.getElementById('BTC').addEventListener("click", () => {
+    allData("BTC", 2);
+});
+
+//Ethereum
+document.getElementById('ETH').addEventListener("click", () => {
+    allData("ETH", 2);
+});
+
+const allData = async (aandeelNaam, optie) => {
+
+    //Foutmelding boodschap resetten
+    document.getElementById('message').innerHTML = "";
+
+    //aandelen
+    if (optie === 1) {
+        //Alpha Vantage data API adres (url) om aandelen op te vragen (Daily Series)
+        url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + dataName + "&apikey=" + apiKey;
+        dataWaarde = "USD";
+        tijdSerie = "Time Series (Daily)";
+        hoog = "2. high";
+        laag = "3. low";
+        aandeel = 70;
+        console.log("Aandelen");
+    }
+
+    //crypto koersen
+    if (optie === 2) {
+        url = "https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol=" + dataName + "&market=EUR&apikey=" + apiKey;
+        dataWaarde = "EURO";
+        tijdSerie = "Time Series (Digital Currency Daily)";
+        hoog = "2a. high (EUR)";
+        laag = "3a. low (EUR)";
+        aandeel = 940;
+        console.log("Crypto");
+    }  
+    
+
+```
+We gaan ook de stockDataParsing iets aanpassen, zodat we de variabelen die we in het if-statement in Alldata hebben ingelezen kunnen gebruiken voor het parsen van de JSON data. Als je dit voor elkaar hebt is de app af! Let op, we hebben hier maar vier aandelen ingelezen, maar je kunt er veel meer uitlezen als je wilt. 
+ 
+in script.js
+```JavaScript
+// tijdelijke lokale variabelen die nodig zijn om de data uit de JSON te parsen
+    let x;
+    let tijdsData;
+    let tempLabels = [];
+    let tempHigh = [];
+    let tempLow = [];
+
+    // uit de variabele de specifieke data (Time Series) halen en array maken voor de namen (labels) van ieder datapunt (i.e. datum + uur)
+    tempLabels = Object.keys(data[tijdSerie]);        
+
+    //de uurdata uit het antwoord lezen uit specifieke tijdSerie
+    tijdsData = data[tijdSerie];
+
+    //data uit de variabele halen voor hoogste en laagste handelsprijzen
+    for (x in tijdsData) {
+        tempHigh.push(tijdsData[x][hoog]);
+        tempLow.push(tijdsData[x][laag]);
+    }
+
+    //laatste waarden afhalen om laatste maand over te houden        
+    while(aandeel--){
+        tempLabels.pop();
+        tempHigh.pop();
+        tempLow.pop();
+    }             
+    
+    console.log(tempLabels);
+    // het omdraaien van de volgorde 
+    dataLabels = tempLabels.reverse();
+    dataHigh = tempHigh.reverse();
+    dataLow = tempLow.reverse();
+}
+```

@@ -85,11 +85,11 @@ const allData = async (aandeelNaam, optie) => {
         return;
     }
 
-    const update = await stockDataParsing(stockData, optie);
+    const update = await stockDataParsing(stockData);
     const plotten = await setGraphs(dataLabels, dataLow, dataHigh, dataName, dataWaarde);
 }
 
-const stockDataParsing = async (data, optie) => {
+const stockDataParsing = async (data) => {
 
     // tijdelijke lokale variabelen die nodig zijn om de data uit de JSON te parsen
     let x;
