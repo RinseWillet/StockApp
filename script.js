@@ -6,6 +6,10 @@ var dataHigh = [];
 var dataLow = [];
 var dataLabels = [];
 var dataWaarde = "";
+var tijdSerie = "";
+var hoog = "";
+var laag = "";
+var aandeel = 0;
 
 // als op invoeren gedrukt wordt start aanmaken van grafiek
 // deze link op https://www.alphavantage.co/documentation/ (https://www.alphavantage.co/query?function=LISTING_STATUS&apikey=demo) geeft een lijst van alle
@@ -51,11 +55,21 @@ const allData = async (aandeelNaam, optie) => {
         //Alpha Vantage data API adres (url) om aandelen op te vragen (Daily Series)
         url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + dataName + "&apikey=" + apiKey;
         dataWaarde = "USD";
+        tijdSerie = "Time Series (Daily)";
+        hoog = "2. high";
+        laag = "3. low";
+        aandeel = 70;
+        console.log("Aandelen");
     }
 
     if (optie === 2) {
         url = "https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol=" + dataName + "&market=EUR&apikey=" + apiKey;
         dataWaarde = "EURO";
+        tijdSerie = "Time Series (Digital Currency Daily)";
+        hoog = "2a. high (EUR)";
+        laag = "3a. low (EUR)";
+        aandeel = 940;
+        console.log("Crypto");
     }  
 
     const stockDataCall = await fetch(url);
@@ -70,6 +84,7 @@ const allData = async (aandeelNaam, optie) => {
         foutmelding.innerHTML = `<h1>Deze API-call ging fout.</h1>`
         return;
     }
+
     const update = await stockDataParsing(stockData, optie);
     const plotten = await setGraphs(dataLabels, dataLow, dataHigh, dataName, dataWaarde);
 }
@@ -82,53 +97,26 @@ const stockDataParsing = async (data, optie) => {
     let tempLabels = [];
     let tempHigh = [];
     let tempLow = [];
-    let aandeel = 70;
-    let crypto = 940;    
 
-    if (optie === 1) {
-        // uit de variabele de specifieke data (Time Series) halen en array maken voor de namen (labels) van ieder datapunt (i.e. datum + uur)
-        tempLabels = Object.keys(data["Time Series (Daily)"]);        
+    // uit de variabele de specifieke data (Time Series) halen en array maken voor de namen (labels) van ieder datapunt (i.e. datum + uur)
+    tempLabels = Object.keys(data[tijdSerie]);        
 
-        //de uurdata uit het antwoord lezen (Time Series (Daily))
-        tijdsData = data["Time Series (Daily)"];
+    //de uurdata uit het antwoord lezen uit specifieke tijdSerie
+    tijdsData = data[tijdSerie];
 
-        //data uit de variabele halen voor hoogste ("2. high") en laagste ( "3. low") handelsprijzen en het handelsvolume ("5. volume")
-        for (x in tijdsData) {
-            tempHigh.push(tijdsData[x]["2. high"]);
-            tempLow.push(tijdsData[x]["3. low"]);
-        }
-
-        //laatste 70 waarden afhalen om laatste maand over te houden        
-        while(aandeel--){
-            tempLabels.pop();
-            tempHigh.pop();
-            tempLow.pop();
-        }             
+    //data uit de variabele halen voor hoogste en laagste handelsprijzen
+    for (x in tijdsData) {
+        tempHigh.push(tijdsData[x][hoog]);
+        tempLow.push(tijdsData[x][laag]);
     }
 
-    if (optie === 2) {
-
-        // uit de variabele de specifieke data (Time Series) halen en array maken voor de namen (labels) van ieder datapunt (i.e. datum + uur)
-        tempLabels = Object.keys(data["Time Series (Digital Currency Daily)"]);        
-
-        //de uurdata uit het antwoord lezen (Time Series (Daily))
-        tijdsData = data["Time Series (Digital Currency Daily)"];
-
-        //data uit de variabele halen voor hoogste ("2. high") en laagste ( "3. low") handelsprijzen
-        for (x in tijdsData) {
-            console.log(x);
-            tempHigh.push(tijdsData[x]["2a. high (EUR)"]);
-            tempLow.push(tijdsData[x]["3a. low (EUR)"]);
-        }
-
-        //laatste 940 waarden afhalen om laatste twee maanden over te houden 
-        while(crypto--){
-            tempLabels.pop();
-            tempHigh.pop();
-            tempLow.pop();
-        }
-    }
-
+    //laatste waarden afhalen om laatste maand over te houden        
+    while(aandeel--){
+        tempLabels.pop();
+        tempHigh.pop();
+        tempLow.pop();
+    }             
+    
     console.log(tempLabels);
     // het omdraaien van de volgorde 
     dataLabels = tempLabels.reverse();
