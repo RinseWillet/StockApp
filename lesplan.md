@@ -399,10 +399,13 @@ const allData = async (aandeelNaam, optie) => {
     
 
 ```
-We gaan ook de stockDataParsing iets aanpassen, zodat we de variabelen die we in het if-statement in Alldata hebben ingelezen kunnen gebruiken voor het parsen van de JSON data. Als je dit voor elkaar hebt is de app af! Let op, we hebben hier maar vier aandelen ingelezen, maar je kunt er veel meer uitlezen als je wilt. 
+We gaan ook de stockDataParsing iets aanpassen, zodat we de variabelen die we in het if-statement in Alldata hebben ingelezen kunnen gebruiken voor het parsen van de JSON data. Als je dit voor elkaar hebt is de app af! Let op, we hebben hier maar vier aandelen ingelezen, maar je kunt er veel meer uitlezen als je wilt. Met deze link kun je bijvoorbeeld een lijst krijgen voor alle aandelen en ETFs die de laatste handelsdag nog actief waren. - https://www.alphavantage.co/query?function=LISTING_STATUS&apikey=demo - Daarnaast zijn er ook nog meer cryptocurrencies te vinden. Je kunt van al deze gewoon de SYMBOL (afkorting) neerzetten in plaats van bijv. ASML of NVDA of voor Crypto BTC of ETH.
  
 in script.js
 ```JavaScript
+
+const stockDataParsing = async (data) => {
+
 // tijdelijke lokale variabelen die nodig zijn om de data uit de JSON te parsen
     let x;
     let tijdsData;
